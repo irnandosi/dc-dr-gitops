@@ -15,7 +15,7 @@ spec:
     registry:
       url: docker://quay.io/containerdisks/fedora:latest
   storage:
-    storageClassName: REPLACE_STORAGE_CLASS
+    storageClassName: lvms-vg1
     resources:
       requests:
         storage: 30Gi

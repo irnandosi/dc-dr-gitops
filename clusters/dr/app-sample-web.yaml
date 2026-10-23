@@ -8,7 +8,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://git.example.com/team/dc-dr-gitops.git
+    repoURL: https://github.com/irnandosi/dc-dr-gitops.git
     targetRevision: main
     path: apps/sample-web/overlays/dr
   destination:

@@ -5,7 +5,7 @@ kind: Route
 metadata:
   name: sample-web-global
 spec:
-  host: sample-web.example.com
+  host: web.poc.imid.local
   to:
     kind: Service
     name: sample-web

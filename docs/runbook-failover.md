@@ -15,6 +15,7 @@ Catat waktu mulai: `T0 = ______`
 Pilih salah satu (jangan scale-down manual: self-heal Argo CD akan mengembalikannya):
 - Matikan ingress/jaringan DC, atau matikan node/cluster DC (simulasi paling realistis), atau
 - Set DC ke standby lewat Git: `scripts/set-state.sh dc standby` lalu commit/push, atau
+- (SNO) matikan VM/node SNO DC. Argo CD DC ikut mati, jadi tidak ada masalah self-heal. Lanjut ke langkah 3, dan pastikan DC diset standby dalam commit yang sama (lihat catatan split-brain), atau
 - Nonaktifkan auto-sync Application di DC sebelum mematikan workload.
 
 Waktu bencana: `T1 = ______`
@@ -25,8 +26,12 @@ Langkah ini bergantung mekanisme replikasi (ODF DR, storage vendor, DB replica).
 ## 3. Aktifkan DR lewat Git
 ```bash
 scripts/set-state.sh dr active
-git add -A && git commit -m "DR: failover ke DR" && git push    # atau buat PR lalu merge
+scripts/set-state.sh dc standby      # JANGAN dilewatkan: lihat catatan split-brain di bawah
+git add -A && git commit -m "DR: failover ke DR, DC standby" && git push    # atau buat PR lalu merge
 ```
+**Catatan split-brain:** jika hanya `dr active` yang diubah, saat DC hidup kembali Argo CD DC masih membaca `dc active`
+dan menyalakan workload lagi, sehingga DC dan DR aktif bersamaan (berbahaya untuk workload stateful).
+Dengan DC diset `standby` di commit yang sama, DC otomatis kembali ke kondisi standby begitu naik.
 Argo CD di DR melakukan sync otomatis. Pantau:
 ```bash
 oc get pods -n sample-web -w

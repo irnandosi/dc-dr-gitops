@@ -48,7 +48,8 @@ docs/runbook-failover.md      # langkah uji failover, checklist validasi, feedba
    oc apply -f bootstrap/00-gitops-operator-subscription.yaml
    oc get pods -n openshift-gitops          # tunggu Running
    ```
-3. **Credential repo** jika private (di DC dan DR): isi lalu `oc apply -f bootstrap/01-repo-secret.example.yaml`.
+3. **Credential repo**: tidak diperlukan jika repo **public** (lewati langkah ini). Jika private, isi lalu
+   `oc apply -f bootstrap/01-repo-secret.example.yaml` di DC dan DR.
 4. **Bootstrap app-of-apps**:
    ```bash
    oc apply -f bootstrap/dc/root-app.yaml   # jalankan di cluster DC
@@ -88,3 +89,14 @@ Detail pengujian: `docs/runbook-failover.md`.
 - **OutOfSync berulang pada VM**: cek `argocd app diff`, lalu tambahkan `ignoreDifferences` hanya untuk field
   spesifik yang diubah controller.
 - Versi operator/channel dan nama field bisa berbeda antar versi OCP/GitOps; sesuaikan dengan environment Anda.
+
+## Catatan untuk lab 2 cluster SNO
+- DC = `ocpsno` (apps.ocpsno.imid.local), DR = `ocpsnodrc` (apps.ocpsnodrc.imid.local). Storage class: `lvms-vg1` di keduanya.
+- Pisahkan kubeconfig per cluster (`KUBECONFIG=~/kc-dc` dan `~/kc-dr`) agar tidak salah apply.
+- Route langsung per-site: `sample-web-sample-web.apps.<domain-cluster>`; uji ini dulu sebelum mengubah DNS.
+- Reroute traffic: record DNS `web.poc.imid.local` / `vm.poc.imid.local` (TTL rendah) diarahkan ke IP node SNO yang aktif.
+  Tanpa DNS: `RESOLVE=web.poc.imid.local:443:<IP> scripts/watch-site.sh https://web.poc.imid.local`.
+- Sertifikat default ingress tidak mencakup hostname global; gunakan `curl -k` atau pasang sertifikat custom untuk demo.
+- `sample-vm` butuh OpenShift Virtualization + dukungan virtualisasi di SNO. Jika belum ada, hapus `app-sample-vm.yaml`
+  dari `clusters/dc/kustomization.yaml` dan `clusters/dr/kustomization.yaml` dulu.
+- Saat failover selalu ubah **dua site dalam satu commit** (`dr active` + `dc standby`) untuk mencegah split-brain.

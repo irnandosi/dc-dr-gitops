@@ -4,7 +4,7 @@ kind: Route
 metadata:
   name: sample-vm-global
 spec:
-  host: sample-vm.example.com
+  host: vm.poc.imid.local
   to:
     kind: Service
     name: sample-vm
