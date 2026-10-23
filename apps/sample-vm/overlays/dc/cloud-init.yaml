@@ -1,0 +1,23 @@
+#cloud-config
+# Web server minimal (python3 bawaan Fedora) agar VM bisa dites lewat Route/GSLB.
+# Untuk akses login, tambahkan ssh_authorized_keys milik Anda:
+# ssh_authorized_keys:
+#   - ssh-ed25519 AAAA... user@host
+write_files:
+  - path: /opt/site/index.html
+    content: |
+      <!-- SITE=DC -->
+      <html><body style="font-family:sans-serif"><h1>sample-vm</h1><h2>SITE: DC</h2></body></html>
+  - path: /etc/systemd/system/sample-vm-web.service
+    content: |
+      [Unit]
+      Description=Sample VM web
+      After=network-online.target
+      [Service]
+      ExecStart=/usr/bin/python3 -m http.server 8080 --directory /opt/site
+      Restart=always
+      [Install]
+      WantedBy=multi-user.target
+runcmd:
+  - [systemctl, daemon-reload]
+  - [systemctl, enable, --now, sample-vm-web.service]

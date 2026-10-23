@@ -1,0 +1,21 @@
+# Disk persisten untuk VM. CATATAN PENTING:
+# - Di DR, DataVolume ini akan mengimpor disk BARU dari image sumber, BUKAN data dari DC.
+#   Replikasi data DC->DR harus ditangani terpisah (storage replication / ODF DR / backup).
+# - Prune=false & Delete=false melindungi disk dari penghapusan oleh Argo CD.
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: sample-vm-rootdisk
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/sync-options: Prune=false,Delete=false
+    cdi.kubevirt.io/storage.deleteAfterCompletion: "false"
+spec:
+  source:
+    registry:
+      url: docker://quay.io/containerdisks/fedora:latest
+  storage:
+    storageClassName: REPLACE_STORAGE_CLASS
+    resources:
+      requests:
+        storage: 30Gi

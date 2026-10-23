@@ -1,0 +1,22 @@
+# App-of-apps untuk cluster DR. Apply SEKALI di cluster DR:
+#   oc apply -f bootstrap/dr/root-app.yaml
+# Setelah itu semua Application lain dikelola dari Git (folder clusters/dr).
+# Sengaja TANPA finalizer agar menghapus Application tidak ikut menghapus VM/data.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: root-dr
+  namespace: openshift-gitops
+spec:
+  project: default
+  source:
+    repoURL: https://git.example.com/team/dc-dr-gitops.git
+    targetRevision: main
+    path: clusters/dr
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: openshift-gitops
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true

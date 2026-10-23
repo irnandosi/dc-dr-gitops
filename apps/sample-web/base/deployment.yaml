@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-web
+spec:
+  replicas: 2   # nilai efektif per-site diatur di overlays/*/patch-state.yaml
+  selector:
+    matchLabels:
+      app: sample-web
+  template:
+    metadata:
+      labels:
+        app: sample-web
+    spec:
+      containers:
+        - name: web
+          # Untuk lingkungan disconnected: mirror image ini ke registry internal
+          image: registry.access.redhat.com/ubi9/nginx-124:latest
+          ports:
+            - name: http
+              containerPort: 8080
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          volumeMounts:
+            - name: content
+              mountPath: /opt/app-root/src/index.html
+              subPath: index.html
+      volumes:
+        - name: content
+          configMap:
+            name: sample-web-content

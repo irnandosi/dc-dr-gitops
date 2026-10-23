@@ -1,0 +1,7 @@
+#cloud-config
+# Base (placeholder). Isi sebenarnya ada di overlays/<site>/cloud-init.yaml
+write_files:
+  - path: /opt/site/index.html
+    content: |
+      <!-- SITE=UNKNOWN -->
+      <h1>sample-vm - SITE: UNKNOWN</h1>

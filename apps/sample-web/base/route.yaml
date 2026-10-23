@@ -1,0 +1,15 @@
+# Route "langsung" per-site (hostname otomatis dari domain cluster).
+# Dipakai untuk menguji tiap site secara terpisah, tanpa lewat GSLB/DNS.
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: sample-web
+spec:
+  to:
+    kind: Service
+    name: sample-web
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

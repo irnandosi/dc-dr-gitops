@@ -1,0 +1,7 @@
+# STATE site: ubah via Git (PR) untuk failover/failback. Bisa memakai scripts/set-state.sh
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-web
+spec:
+  replicas: 0

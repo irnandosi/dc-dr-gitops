@@ -1,0 +1,14 @@
+# Route langsung per-site (hostname otomatis) untuk uji tiap site secara terpisah.
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: sample-vm
+spec:
+  to:
+    kind: Service
+    name: sample-vm
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

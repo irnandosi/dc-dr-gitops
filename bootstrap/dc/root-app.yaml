@@ -1,0 +1,22 @@
+# App-of-apps untuk cluster DC. Apply SEKALI di cluster DC:
+#   oc apply -f bootstrap/dc/root-app.yaml
+# Setelah itu semua Application lain dikelola dari Git (folder clusters/dc).
+# Sengaja TANPA finalizer agar menghapus Application tidak ikut menghapus VM/data.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: root-dc
+  namespace: openshift-gitops
+spec:
+  project: default
+  source:
+    repoURL: https://git.example.com/team/dc-dr-gitops.git
+    targetRevision: main
+    path: clusters/dc
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: openshift-gitops
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true

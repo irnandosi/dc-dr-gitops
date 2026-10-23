@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: sample-web-dc
+  namespace: openshift-gitops
+  labels:
+    site: dc
+spec:
+  project: default
+  source:
+    repoURL: https://git.example.com/team/dc-dr-gitops.git
+    targetRevision: main
+    path: apps/sample-web/overlays/dc
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: sample-web
+  syncPolicy:
+    automated:
+      selfHeal: true   # drift manual dikembalikan ke kondisi Git
+      prune: true
+    syncOptions:
+      - PruneLast=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 3m
