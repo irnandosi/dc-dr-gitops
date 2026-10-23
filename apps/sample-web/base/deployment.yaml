@@ -16,6 +16,7 @@ spec:
         - name: web
           # Untuk lingkungan disconnected: mirror image ini ke registry internal
           image: registry.access.redhat.com/ubi9/nginx-124:latest
+          command: ["/usr/libexec/s2i/run"]
           ports:
             - name: http
               containerPort: 8080
