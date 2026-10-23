@@ -4,4 +4,4 @@ kind: VirtualMachine
 metadata:
   name: sample-vm
 spec:
-  runStrategy: Halted
+  runStrategy: Always
