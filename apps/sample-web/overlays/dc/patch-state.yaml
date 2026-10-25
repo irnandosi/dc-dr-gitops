@@ -4,4 +4,4 @@ kind: Deployment
 metadata:
   name: sample-web
 spec:
-  replicas: 0
+  replicas: 2
