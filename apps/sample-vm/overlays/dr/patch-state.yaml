@@ -1,7 +1,0 @@
-# STATE site: Always = aktif, Halted = standby. Ubah via Git (PR) atau scripts/set-state.sh
-apiVersion: kubevirt.io/v1
-kind: VirtualMachine
-metadata:
-  name: sample-vm
-spec:
-  runStrategy: Halted

@@ -1,0 +1,55 @@
+# DataProtectionApplication untuk cluster DC. Apply di cluster DC setelah operator OADP Succeeded.
+# Dua BackupStorageLocation, satu bucket, prefix terpisah per site:
+#   dc-site   : milik site ini, ReadWrite (tempat backup ditulis)
+#   dr-site : milik site lawan, ReadOnly (untuk restore saat failover)
+# Bucket S3 JANGAN diletakkan di DC: jika DC mati, backup ikut hilang.
+apiVersion: oadp.openshift.io/v1alpha1
+kind: DataProtectionApplication
+metadata:
+  name: dpa
+  namespace: openshift-adp
+spec:
+  configuration:
+    velero:
+      defaultPlugins:
+        - openshift
+        - aws
+        - csi
+        - kubevirt
+    nodeAgent:
+      enable: true
+      uploaderType: kopia
+  backupLocations:
+    - name: dc-site
+      velero:
+        provider: aws
+        default: true
+        objectStorage:
+          bucket: BUCKET_NAME_HERE
+          prefix: dc
+          # caCert: <base64 CA S3 jika memakai sertifikat internal>
+        config:
+          region: us-east-1
+          s3Url: https://S3_ENDPOINT_HERE
+          s3ForcePathStyle: "true"
+          profile: default
+          insecureSkipTLSVerify: "true"    # hanya untuk lab; ganti dengan caCert di produksi
+        credential:
+          name: cloud-credentials
+          key: cloud
+    - name: dr-site
+      velero:
+        provider: aws
+        accessMode: ReadOnly
+        objectStorage:
+          bucket: BUCKET_NAME_HERE
+          prefix: dr
+        config:
+          region: us-east-1
+          s3Url: https://S3_ENDPOINT_HERE
+          s3ForcePathStyle: "true"
+          profile: default
+          insecureSkipTLSVerify: "true"
+        credential:
+          name: cloud-credentials
+          key: cloud

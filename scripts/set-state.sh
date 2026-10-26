@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Ubah STATE sebuah site (aktif/standby) di overlay, untuk failover/failback.
-#   active  -> sample-web replicas=2, sample-vm runStrategy=Always
-#   standby -> sample-web replicas=0, sample-vm runStrategy=Halted
+#   active  -> sample-web replicas=2, VM runStrategy=Always (sample-vm dan sample-vm-data)
+#   standby -> sample-web replicas=0, VM runStrategy=Halted
 # Usage: scripts/set-state.sh <dc|dr> <active|standby> [replicas]
 # Script hanya mengedit file; commit & push (atau buat PR) dilakukan manual.
 set -euo pipefail
@@ -14,7 +14,10 @@ case "$STATE" in
   standby) REP=0;           RUN="Halted";;
   *) echo "state harus active atau standby"; exit 1;;
 esac
-sed -i -E "s/^(  replicas:) .*/\1 ${REP}/"    "apps/sample-web/overlays/${SITE}/patch-state.yaml"
-sed -i -E "s/^(  runStrategy:) .*/\1 ${RUN}/" "apps/sample-vm/overlays/${SITE}/patch-state.yaml"
-echo "Site ${SITE^^} -> ${STATE}: sample-web replicas=${REP}, sample-vm runStrategy=${RUN}"
+sed -i -E "s/^(  replicas:) .*/\1 ${REP}/" "apps/sample-web/overlays/${SITE}/patch-state.yaml"
+for app in sample-vm sample-vm-data; do
+  f="apps/${app}/overlays/${SITE}/patch-state.yaml"
+  [ -f "$f" ] && sed -i -E "s/^(  runStrategy:) .*/\1 ${RUN}/" "$f"
+done
+echo "Site ${SITE^^} -> ${STATE}: sample-web replicas=${REP}, VM runStrategy=${RUN}"
 echo "Langkah berikut: git add -A && git commit -m 'DR: ${SITE} ${STATE}' && git push  (atau buat PR)"

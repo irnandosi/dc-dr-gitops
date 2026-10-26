@@ -1,0 +1,15 @@
+# Backup berkala data VM dari site DR. Apply di cluster DR.
+# Nama backup: data-dr-<timestamp>. RPO kasar = interval schedule (di sini 15 menit).
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: data-dr
+  namespace: openshift-adp
+spec:
+  schedule: "*/15 * * * *"
+  template:
+    includedNamespaces:
+      - sample-vm-data
+    snapshotMoveData: true
+    storageLocation: dr-site
+    ttl: 72h0m0s

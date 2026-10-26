@@ -1,0 +1,16 @@
+# Disk data VM. SENGAJA tidak dikelola Argo CD (tidak ada di Git overlay):
+# - Di DC: dibuat SEKALI secara manual (sebelum aplikasi disinkronkan).
+# - Di DR: dibuat oleh proses RESTORE dari backup DC saat failover.
+# Dengan begitu Argo CD tidak berebut dengan restore, dan data tidak ikut ter-prune.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vmdata
+  namespace: sample-vm-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: lvms-vg1
+  resources:
+    requests:
+      storage: 2Gi

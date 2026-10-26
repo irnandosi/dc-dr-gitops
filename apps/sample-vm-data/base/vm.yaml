@@ -1,0 +1,49 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: sample-vm-data
+spec:
+  # runStrategy efektif per-site di overlays/*/patch-state.yaml (Always / Halted)
+  runStrategy: Always
+  template:
+    metadata:
+      labels:
+        app: sample-vm-data
+    spec:
+      domain:
+        cpu:
+          cores: 1
+        memory:
+          guest: 2Gi
+        devices:
+          disks:
+            - name: rootdisk
+              disk:
+                bus: virtio
+            - name: datadisk
+              serial: datadisk
+              disk:
+                bus: virtio
+            - name: cloudinit
+              disk:
+                bus: virtio
+          interfaces:
+            - name: default
+              masquerade: {}
+      networks:
+        - name: default
+          pod: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        # Disk OS: efemeral (dibuat ulang tiap start). Data penting hanya di datadisk.
+        - name: rootdisk
+          containerDisk:
+            image: quay.io/containerdisks/fedora:latest
+        # Disk data: PVC "vmdata", dibuat di luar GitOps (lihat seed/vmdata-pvc.yaml)
+        - name: datadisk
+          persistentVolumeClaim:
+            claimName: vmdata
+        - name: cloudinit
+          cloudInitNoCloud:
+            secretRef:
+              name: sample-vm-data-cloudinit

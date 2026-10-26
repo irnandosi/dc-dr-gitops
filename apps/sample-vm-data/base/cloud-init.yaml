@@ -1,0 +1,5 @@
+#cloud-config
+# Placeholder base. Isi sebenarnya di overlays/<site>/cloud-init.yaml
+write_files:
+  - path: /etc/site
+    content: "UNKNOWN\n"

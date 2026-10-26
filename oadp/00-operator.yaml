@@ -1,0 +1,29 @@
+# Apply di KEDUA cluster (ocpsno dan ocpsnodrc).
+# Cek channel: oc get packagemanifest redhat-oadp-operator -n openshift-marketplace -o jsonpath='{.status.channels[*].name}'
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-adp
+  labels:
+    openshift.io/cluster-monitoring: "true"
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: oadp-operator-group
+  namespace: openshift-adp
+spec:
+  targetNamespaces:
+    - openshift-adp
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: redhat-oadp-operator
+  namespace: openshift-adp
+spec:
+  channel: stable
+  installPlanApproval: Automatic
+  name: redhat-oadp-operator
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace

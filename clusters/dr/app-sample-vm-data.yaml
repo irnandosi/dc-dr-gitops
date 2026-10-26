@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: sample-vm-data-dr
+  namespace: openshift-gitops
+  labels:
+    site: dr
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/irnandosi/dc-dr-gitops.git
+    targetRevision: main
+    path: apps/sample-vm-data/overlays/dr
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: sample-vm-data
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+    syncOptions:
+      - PruneLast=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 3m

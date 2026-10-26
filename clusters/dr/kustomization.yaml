@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - app-sample-web.yaml
   - app-sample-vm.yaml
+  - app-sample-vm-data.yaml

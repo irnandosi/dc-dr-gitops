@@ -1,0 +1,16 @@
+# Route global: hostname sama di DC dan DR; DNS menentukan site aktif.
+# Buat record DNS: vmdata.poc.imid.local (scripts/ipa-flip.sh membuatnya otomatis bila belum ada).
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: sample-vm-data-global
+spec:
+  host: vmdata.poc.imid.local
+  to:
+    kind: Service
+    name: sample-vm-data
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
